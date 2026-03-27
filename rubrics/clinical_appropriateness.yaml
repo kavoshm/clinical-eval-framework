@@ -1,0 +1,121 @@
+# Clinical Appropriateness Evaluation Rubric
+# Assesses language, tone, structure, and documentation standards
+
+name: clinical_appropriateness
+display_name: "Clinical Appropriateness"
+description: >
+  Evaluates whether the output follows standard clinical documentation
+  practices, uses appropriate medical terminology, maintains professional
+  tone, and is structured in a way that facilitates clinical decision-making.
+  Includes assessment of abbreviation usage, organizational structure,
+  and overall readability for a clinical audience.
+
+category: appropriateness
+weight: 0.8  # Important but slightly less critical than accuracy/safety
+version: "1.0"
+
+scale:
+  min: 1
+  max: 5
+
+criteria:
+  - name: documentation_format
+    description: "Does the output follow standard clinical documentation format (SOAP, A&P, problem-based)?"
+    weight: 1.0
+
+  - name: medical_terminology
+    description: "Is medical terminology used correctly and consistently?"
+    weight: 1.0
+
+  - name: professional_tone
+    description: "Is the tone professional, objective, and appropriate for clinical documentation?"
+    weight: 0.9
+
+  - name: abbreviation_usage
+    description: "Are standard medical abbreviations used appropriately?"
+    weight: 0.7
+
+  - name: logical_organization
+    description: "Is information organized logically (by system, problem, or chronology)?"
+    weight: 0.9
+
+  - name: appropriate_detail_level
+    description: "Is the level of detail appropriate for the clinical context?"
+    weight: 0.8
+
+scoring_rubric:
+  1:
+    label: "Unprofessional"
+    description: >
+      The output reads like a layperson's description. No clinical
+      structure, incorrect or absent medical terminology, casual or
+      inappropriate tone. Non-standard or confusing abbreviations.
+      Would not be acceptable in any clinical documentation context.
+    examples:
+      - "This guy has diabetes and his labs are kind of off"
+      - "Patient seems OK, maybe check back later"
+      - "No structure, stream-of-consciousness format"
+
+  2:
+    label: "Below Clinical Standards"
+    description: >
+      Some medical terms used but inconsistently. No clear
+      documentation structure. Tone may be too casual or
+      inappropriately alarmist. Does not follow any recognized
+      clinical documentation format.
+    examples:
+      - "Patient has DM2 and HTN. Blood tests show some issues."
+      - "Mixes casual and clinical language inconsistently"
+
+  3:
+    label: "Adequate"
+    description: >
+      Uses basic medical terminology and has some structure.
+      A clinician could understand it but would find it
+      substandard. Missing standard organizational elements.
+      May be verbose or lack the conciseness expected in
+      clinical documentation.
+    examples:
+      - "Lists findings in paragraphs but not structured by problem"
+      - "Correct terminology but overly wordy for clinical notes"
+
+  4:
+    label: "Professionally Acceptable"
+    description: >
+      Follows clinical documentation norms with standard
+      terminology, structured format, and appropriate tone.
+      Minor deviations from ideal practice. Acceptable for
+      professional use with minimal adjustments.
+    examples:
+      - "Assessment and Plan format with good terminology"
+      - "Problem-based organization, appropriate abbreviations"
+
+  5:
+    label: "Exemplary Clinical Documentation"
+    description: >
+      Follows standard clinical documentation formats perfectly.
+      Precise medical terminology used throughout. Professional
+      objectivity maintained. Information organized to facilitate
+      clinical decision-making. Appropriate use of standard
+      abbreviations. Concise yet thorough.
+    examples:
+      - "67M with T2DM, HTN, stage IIIA NSCLC s/p C1 carbo/pem"
+      - "Problem-based A&P with each system addressed separately"
+      - "Standard abbreviations, appropriate detail level"
+
+evaluation_prompt_template: >
+  You are a clinical documentation expert evaluating the
+  appropriateness and professionalism of an LLM-generated output.
+
+  Evaluate:
+  1. Does it follow a standard clinical format (SOAP, A&P, etc.)?
+  2. Is medical terminology used correctly?
+  3. Is the tone professional and objective?
+  4. Are abbreviations standard and appropriate?
+  5. Is information logically organized?
+  6. Is the detail level appropriate?
+
+  Generated Output:
+  {output_text}
+
+  Score (1-5) and comment on documentation quality.

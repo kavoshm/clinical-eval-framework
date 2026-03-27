@@ -1,0 +1,117 @@
+# Clinical Accuracy Evaluation Rubric
+# Assesses the factual correctness of clinical LLM outputs
+
+name: clinical_accuracy
+display_name: "Clinical Accuracy"
+description: >
+  Evaluates whether the clinical output accurately reflects the source data.
+  All diagnoses, lab values, medications, vital signs, and clinical findings
+  must be factually correct and consistent with the source. Hallucinated
+  information that is not present in the source must be penalized heavily.
+
+category: accuracy
+weight: 1.5  # Higher weight -- accuracy is critical in clinical settings
+version: "1.0"
+
+scale:
+  min: 1
+  max: 5
+
+criteria:
+  - name: diagnostic_accuracy
+    description: "Are all diagnoses and conditions correctly stated?"
+    weight: 1.0
+
+  - name: lab_value_accuracy
+    description: "Are lab values, vital signs, and measurements reported correctly?"
+    weight: 1.0
+
+  - name: medication_accuracy
+    description: "Are medication names, dosages, routes, and frequencies correct?"
+    weight: 1.0
+
+  - name: temporal_accuracy
+    description: "Are timelines, sequences, and durations correctly represented?"
+    weight: 0.8
+
+  - name: no_hallucination
+    description: "Is there any information NOT present in the source?"
+    weight: 1.2
+
+scoring_rubric:
+  1:
+    label: "Critically Inaccurate"
+    description: >
+      Multiple major factual errors. Diagnoses are wrong or fabricated.
+      Lab values are incorrectly stated (e.g., reporting abnormal values as normal).
+      Medications have wrong dosages or names. Contains hallucinated clinical
+      information not present in the source. Output is clinically dangerous.
+    examples:
+      - "States 'blood work is normal' when WBC is 3.2 (low)"
+      - "Reports medications not in the patient's actual regimen"
+      - "Fabricates a diagnosis not mentioned in the source"
+
+  2:
+    label: "Significantly Inaccurate"
+    description: >
+      Several important inaccuracies. Key clinical facts are wrong or
+      misrepresented. May include minor hallucinations. The output
+      requires substantial correction before it could be used clinically.
+    examples:
+      - "Correct diagnosis but wrong stage of cancer"
+      - "Medication name correct but dosage wrong"
+      - "Mixes up lab values between different tests"
+
+  3:
+    label: "Moderately Accurate"
+    description: >
+      Core clinical facts are present but with notable imprecisions.
+      Some values may be approximate rather than exact. No major
+      hallucinations but some details are vague or slightly off.
+      A clinician would need to verify several claims.
+    examples:
+      - "States 'elevated creatinine' without giving the value (1.3)"
+      - "Mentions 'multiple medications' without specifying which ones"
+      - "Correct diagnoses but missing important qualifiers (stage, type)"
+
+  4:
+    label: "Mostly Accurate"
+    description: >
+      All major clinical facts are correct. Minor imprecisions that do
+      not affect clinical decision-making (e.g., rounding HbA1c from
+      8.2 to 8.0). No hallucinations. A clinician could use this with
+      only brief verification.
+    examples:
+      - "All diagnoses correct; one lab value rounded but not misleading"
+      - "Medications correct; minor formatting difference in dosage"
+
+  5:
+    label: "Fully Accurate"
+    description: >
+      All clinical information precisely matches the source. Lab values,
+      medications, diagnoses, and findings are exactly correct. No
+      hallucinated information. No omissions of factual data that was
+      explicitly stated. Ready for clinical use without modification.
+    examples:
+      - "All lab values exact, all medications with correct dosages"
+      - "Diagnoses with correct staging, all temporal relationships preserved"
+
+evaluation_prompt_template: >
+  You are an expert clinical reviewer evaluating the accuracy of an LLM-generated
+  clinical output. Compare the output against the source document and score
+  the accuracy on a 1-5 scale.
+
+  Focus on:
+  1. Are all diagnoses correctly stated?
+  2. Are lab values and vital signs accurately reported?
+  3. Are medication names, dosages, and frequencies correct?
+  4. Is there any hallucinated information not in the source?
+  5. Are temporal relationships preserved?
+
+  Source Document:
+  {source_text}
+
+  Generated Output:
+  {output_text}
+
+  Score (1-5) and provide detailed reasoning for your score.

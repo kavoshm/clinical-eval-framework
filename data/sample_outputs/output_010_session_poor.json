@@ -1,0 +1,9 @@
+{
+  "output_id": "out_010",
+  "text": "Patient tolerated chemotherapy well. Labs are within normal limits. Recommend increasing metformin to 2000mg BID for better glucose control. No need for close follow-up. Return in 3 months.",
+  "source_text": "Patient: 67-year-old male with Type 2 diabetes mellitus (HbA1c 8.2%), hypertension (on lisinopril 20mg daily), and recently diagnosed stage IIIA non-small cell lung cancer. Patient presents for follow-up after first cycle of carboplatin/pemetrexed chemotherapy. Reports moderate fatigue, decreased appetite, and occasional nausea. Blood glucose readings have been elevated (180-240 mg/dL fasting) since starting chemotherapy. Current medications: metformin 1000mg BID, lisinopril 20mg daily, ondansetron 8mg PRN nausea. Lab results: WBC 3.2 (low), platelets 145, creatinine 1.3 (slightly elevated).",
+  "output_type": "session_summary",
+  "model": "gpt-3.5-turbo",
+  "prompt_version": "v1.0",
+  "metadata": {"quality_label": "poor"}
+}

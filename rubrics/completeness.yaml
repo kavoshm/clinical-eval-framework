@@ -1,0 +1,123 @@
+# Clinical Completeness Evaluation Rubric
+# Assesses whether all relevant clinical information is captured
+
+name: clinical_completeness
+display_name: "Clinical Completeness"
+description: >
+  Evaluates whether the output captures all clinically relevant
+  information from the source document. This includes all active
+  diagnoses, current medications, relevant lab results, patient-reported
+  symptoms, treatment response, and recommended follow-up actions.
+  Completeness is evaluated relative to what a clinician would need
+  for continuity of care.
+
+category: completeness
+weight: 1.0
+version: "1.0"
+
+scale:
+  min: 1
+  max: 5
+
+criteria:
+  - name: diagnoses_covered
+    description: "Are all active diagnoses and conditions mentioned?"
+    weight: 1.0
+
+  - name: medications_listed
+    description: "Are all current medications with dosages included?"
+    weight: 1.0
+
+  - name: lab_results_included
+    description: "Are relevant lab results and their significance noted?"
+    weight: 1.0
+
+  - name: symptoms_captured
+    description: "Are patient-reported symptoms documented?"
+    weight: 0.8
+
+  - name: follow_up_plan
+    description: "Is there a clear follow-up plan with timeline?"
+    weight: 0.9
+
+  - name: treatment_response
+    description: "Is the response to current treatment documented?"
+    weight: 0.8
+
+scoring_rubric:
+  1:
+    label: "Severely Incomplete"
+    description: >
+      The output captures only one or two items from the source.
+      Major clinical elements are absent: missing most diagnoses,
+      no medications listed, no lab values, no symptoms. The output
+      is insufficient for any clinical use and would require
+      complete review of the original source.
+    examples:
+      - "Only mentions the patient has cancer, nothing else"
+      - "States 'continue medications' without listing any"
+
+  2:
+    label: "Incomplete"
+    description: >
+      Multiple important clinical elements are missing. May mention
+      diagnoses but omit all medications, or include some labs but
+      miss symptoms entirely. A clinician would need to review the
+      original source to fill substantial gaps.
+    examples:
+      - "Lists diagnoses but no medications or lab values"
+      - "Mentions chemo side effects but misses all lab abnormalities"
+
+  3:
+    label: "Partially Complete"
+    description: >
+      Covers some key clinical findings but has notable gaps.
+      Major categories are represented but without sufficient
+      detail. A clinician would need to reference the original
+      source for several important items.
+    examples:
+      - "Lists diagnoses and some medications but missing lab values"
+      - "Notes symptoms but does not include specific values or ranges"
+
+  4:
+    label: "Mostly Complete"
+    description: >
+      Captures most clinically relevant information with only minor
+      omissions. May miss a secondary lab value or a less critical
+      medication. The output provides a solid clinical picture that
+      is adequate for most uses with minimal additional reference.
+    examples:
+      - "All diagnoses, most medications, key labs; missing platelet count"
+      - "Good overall coverage; missing one medication from the list"
+
+  5:
+    label: "Fully Complete"
+    description: >
+      All clinically relevant information from the source is captured.
+      Every diagnosis, medication, lab value, symptom, and follow-up
+      item is represented with appropriate detail. No significant
+      omissions. The output stands alone as a complete clinical summary.
+    examples:
+      - "All 3 diagnoses, all 3 medications with dosages, all lab values"
+      - "Includes symptoms, treatment response, and specific follow-up plan"
+
+evaluation_prompt_template: >
+  You are a clinical documentation reviewer evaluating completeness.
+  Check whether all clinically relevant information from the source
+  is captured in the output.
+
+  Check for:
+  1. All active diagnoses mentioned?
+  2. All medications with dosages listed?
+  3. All relevant lab results included?
+  4. Patient symptoms documented?
+  5. Follow-up plan specified?
+  6. Treatment response noted?
+
+  Source Document:
+  {source_text}
+
+  Generated Output:
+  {output_text}
+
+  Score (1-5) and list any missing clinical elements.
