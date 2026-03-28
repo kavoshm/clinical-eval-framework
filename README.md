@@ -7,6 +7,8 @@
 
 # Clinical Output Evaluation Framework
 
+[![CI](https://github.com/monfaredkavosh/clinical-eval-framework/actions/workflows/ci.yml/badge.svg)](https://github.com/monfaredkavosh/clinical-eval-framework/actions/workflows/ci.yml)
+
 **A rubric-based LLM-as-judge evaluation harness for clinical AI outputs, built for healthcare systems where evaluation is not optional -- it is a safety requirement.**
 
 <p align="center">
@@ -38,6 +40,33 @@ The pipeline flows through five stages: clinical outputs are loaded, matched aga
 <p align="center">
   <img src="docs/images/eval_architecture.png" alt="Architecture Diagram" width="100%">
 </p>
+
+```mermaid
+flowchart TD
+    A["Clinical LLM Outputs\n(JSON)"] --> B["Rubric Loading\n(4 YAML rubrics)"]
+    B --> C["LLM-as-Judge Scoring\n(CoT reasoning per rubric)"]
+
+    C --> D["Accuracy\nweight: 1.5x"]
+    C --> E["Safety\nweight: 2.0x"]
+    C --> F["Completeness\nweight: 1.0x"]
+    C --> G["Appropriateness\nweight: 0.8x"]
+
+    D --> H["Weighted Score\nAggregation"]
+    E --> H
+    F --> H
+    G --> H
+
+    H --> I["SQLite Storage\n(eval_runs, eval_results)"]
+    I --> J["Report Generation\n(Markdown + regression detection)"]
+
+    E -. "score < 3.0" .-> K["Safety Alert"]
+
+    style A fill:#e3f2fd,stroke:#1565c0
+    style E fill:#ffebee,stroke:#c62828
+    style K fill:#ffebee,stroke:#c62828
+    style J fill:#e8f5e9,stroke:#2e7d32
+    style H fill:#f3e5f5,stroke:#6a1b9a
+```
 
 | Stage | Component | File |
 |-------|-----------|------|
@@ -583,6 +612,50 @@ clinical-eval-framework/
     test_evaluator.py                # Evaluation pipeline and comparison tests
     test_storage.py                  # SQLite storage layer tests
     test_reporter.py                 # Report generation tests
+```
+
+---
+
+## Docker
+
+### Build the Image
+
+```bash
+docker build -t clinical-eval-framework .
+```
+
+### Run with Docker
+
+```bash
+# Show available CLI commands
+docker run clinical-eval-framework --help
+
+# Run evaluation in simulated mode (no API key needed)
+docker run clinical-eval-framework eval \
+    --input data/sample_outputs/ \
+    --prompt-version v1.0
+
+# Run evaluation with real LLM judge (requires API key)
+docker run -e OPENAI_API_KEY=sk-your-key-here \
+    clinical-eval-framework eval \
+    --input data/sample_outputs/ \
+    --prompt-version v2.0
+
+# Compare two evaluation runs
+docker run clinical-eval-framework compare run_v1_demo run_v2_demo
+
+# View evaluation history
+docker run clinical-eval-framework history --limit 20
+```
+
+To persist evaluation results and the SQLite database across runs, mount a volume:
+
+```bash
+docker run -v $(pwd)/outputs:/app/outputs \
+    clinical-eval-framework eval \
+    --input data/sample_outputs/ \
+    --prompt-version v1.0 \
+    --output-report outputs/eval_report.md
 ```
 
 ---
